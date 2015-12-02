@@ -50,6 +50,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="PrimitiveTypes\Enum.cs" />
     <Compile Include="PrimitiveTypes\Boolean.cs" />
     <Compile Include="PrimitiveTypes\Char.cs" />
     <Compile Include="PrimitiveTypes\Decimal.cs" />

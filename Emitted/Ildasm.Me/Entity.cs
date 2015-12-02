@@ -28,6 +28,10 @@ namespace Ildasm.Me
         public short? NullableInt16 { get; set; }
         public ushort UInt16 { get; set; }
         public ushort? NullableUInt16 { get; set; }
+
+        public EntityEnum Enum { get; set; }
+        public EntityEnum? NullableEnum { get; set; }
+
         public string String { get; set; }
 
         public Nested Nested { get; set; }
@@ -38,8 +42,8 @@ namespace Ildasm.Me
                    && Char == other.Char && NullableChar == other.NullableChar && Decimal == other.Decimal && NullableDecimal == other.NullableDecimal && Double.Equals(other.Double)
                    && NullableDouble.Equals(other.NullableDouble) && Single.Equals(other.Single) && NullableSingle.Equals(other.NullableSingle) && Int32 == other.Int32 && NullableInt32 == other.NullableInt32
                    && UInt32 == other.UInt32 && NullableUInt32 == other.NullableUInt32 && Int64 == other.Int64 && NullableInt64 == other.NullableInt64 && UInt64 == other.UInt64 && NullableUInt64 == other.NullableUInt64
-                   && Int16 == other.Int16 && NullableInt16 == other.NullableInt16 && UInt16 == other.UInt16 && NullableUInt16 == other.NullableUInt16 && string.Equals(String, other.String)
-                   && Equals(Nested, other.Nested);
+                   && Int16 == other.Int16 && NullableInt16 == other.NullableInt16 && UInt16 == other.UInt16 && NullableUInt16 == other.NullableUInt16 && Enum == other.Enum && NullableEnum == other.NullableEnum
+                   && string.Equals(String, other.String) && Equals(Nested, other.Nested);
         }
 
         public override bool Equals(object obj)
@@ -48,7 +52,7 @@ namespace Ildasm.Me
                 return false;
             if (ReferenceEquals(this, obj))
                 return true;
-            if (obj.GetType() != this.GetType())
+            if (obj.GetType() != GetType())
                 return false;
             return Equals((Entity) obj);
         }
@@ -83,6 +87,8 @@ namespace Ildasm.Me
                 hashCode = (hashCode * 397) ^ NullableInt16.GetHashCode();
                 hashCode = (hashCode * 397) ^ UInt16.GetHashCode();
                 hashCode = (hashCode * 397) ^ NullableUInt16.GetHashCode();
+                hashCode = (hashCode * 397) ^ (int) Enum;
+                hashCode = (hashCode * 397) ^ NullableEnum.GetHashCode();
                 hashCode = (hashCode * 397) ^ (String != null ? String.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Nested != null ? Nested.GetHashCode() : 0);
                 return hashCode;

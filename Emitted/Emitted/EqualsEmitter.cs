@@ -50,10 +50,9 @@ namespace Emitted
                 {
                     // todo: nullable
                     // todo: array
-                    // todo: enum
                     // todo: struct (DateTime, Guid)
                     var propertyType = propertyInfo.PropertyType;
-                    if (BneTypes.Contains(propertyType))
+                    if (BneTypes.Contains(propertyType) || propertyType.IsEnum)
                         EmitBne(il, propertyInfo.GetMethod, r0);
                     else if (StaticEqualsTypes.ContainsKey(propertyType))
                         EmitStatic(il, propertyInfo.GetMethod, StaticEqualsTypes[propertyType], r0);

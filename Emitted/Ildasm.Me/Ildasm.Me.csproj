@@ -41,6 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entity.cs" />
+    <Compile Include="EntityEnum.cs" />
+    <Compile Include="EnumEquals.cs" />
     <Compile Include="Nested.cs" />
     <Compile Include="NullableEquals.cs" />
     <Compile Include="EntityEquals.cs" />
