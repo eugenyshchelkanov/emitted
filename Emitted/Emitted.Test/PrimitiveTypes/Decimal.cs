@@ -14,7 +14,7 @@ namespace Emitted.Test.PrimitiveTypes
         [TestCase(0, -1, false)]
         [TestCase(0, -0.1, false)]
         [TestCase(1, -1, false)]
-        public void Equals(double left, double right, bool expected)
+        public void Equals(decimal left, decimal right, bool expected)
         {
             var first = new Testee { Value = left };
             var second = new Testee { Value = right };
@@ -23,7 +23,7 @@ namespace Emitted.Test.PrimitiveTypes
 
         public class Testee
         {
-            public double Value { get; set; }
+            public decimal Value { get; set; }
         }
     }
 }
