@@ -13,7 +13,8 @@ namespace Emitted
         private static readonly MethodInfo SingleEquals = ((MethodCallExpression) ((Expression<Func<float, float, bool>>) ((x, y) => x.Equals(x))).Body).Method;
         private static readonly MethodInfo DoubleEquals = ((MethodCallExpression) ((Expression<Func<double, double, bool>>) ((x, y) => x.Equals(x))).Body).Method;
         private static readonly MethodInfo DecimalEquals = ((MethodCallExpression) ((Expression<Func<decimal, decimal, bool>>) ((x, y) => decimal.Equals(x, y))).Body).Method;
-        private static readonly MethodInfo ObjectEquals = ((MethodCallExpression) ((Expression<Func<object, object, bool>>) ((x, y) => Equals(x, y))).Body).Method;
+        private static readonly MethodInfo ObjectEquals = ((MethodCallExpression) ((Expression<Func<object, object, bool>>) ((x, y) => x.Equals(y))).Body).Method;
+
         private static readonly MethodInfo EmittedEquals = ((MethodCallExpression) ((Expression<Func<object, object, bool>>) ((x, y) => Emitted.Equals(x, y))).Body).Method;
 
         private static readonly ISet<Type> BneTypes = new HashSet<Type>
@@ -52,16 +53,17 @@ namespace Emitted
                     // todo: array
                     // todo: struct (DateTime, Guid)
                     var propertyType = propertyInfo.PropertyType;
+                    var nullableType = Nullable.GetUnderlyingType(propertyType);
                     if (BneTypes.Contains(propertyType) || propertyType.IsEnum)
                         EmitBne(il, propertyInfo.GetMethod, r0);
                     else if (StaticEqualsTypes.ContainsKey(propertyType))
                         EmitStatic(il, propertyInfo.GetMethod, StaticEqualsTypes[propertyType], r0);
                     else if (InstanceEqualsTypes.ContainsKey(propertyType))
                         EmitInstance(il, propertyInfo.GetMethod, InstanceEqualsTypes[propertyType], r0);
-                    else if (Nullable.GetUnderlyingType(propertyType) != null)
-                    {
-                        // todo: do not skip!
-                    }
+                    else if (nullableType != null && (BneTypes.Contains(nullableType) || nullableType.IsEnum))
+                        EmitNullableBne(il, propertyInfo.GetMethod, r0);
+                    else if (nullableType != null)
+                        EmitNullableEquals(il, propertyInfo.GetMethod, r0);
                     else
                         EmitStatic(il, propertyInfo.GetMethod, EmittedEquals, r0);
                 }
@@ -90,14 +92,15 @@ namespace Emitted
         private static void EmitInstance(GroboIL il, MethodInfo getMethod, MethodInfo instanceMethod, GroboIL.Label returnFalse)
         {
             // a.Property.Equals(b.Property)
-            var local = il.DeclareLocal(getMethod.ReturnType);
+            var type = getMethod.ReturnType;
+            var local = il.DeclareLocal(type);
             il.Ldarg(0);
             il.Call(getMethod);
             il.Stloc(local);
             il.Ldloca(local);
             il.Ldarg(1);
             il.Call(getMethod);
-            il.Call(instanceMethod, getMethod.ReturnType);
+            il.Call(instanceMethod, type);
             il.Brfalse(returnFalse);
         }
 
@@ -114,10 +117,13 @@ namespace Emitted
 
         private static void EmitNullableBne(GroboIL il, MethodInfo getMethod, GroboIL.Label returnFalse)
         {
-            // todo: write as follows:
             // a.GetValueOrDefault() == b.GetValueOrDefault() && a.HasValue == b.HasValue;
-            var a = il.DeclareLocal(getMethod.ReturnType);
-            var b = il.DeclareLocal(getMethod.ReturnType);
+            var type = getMethod.ReturnType;
+            var getValueOrDefault = type.GetMethod("GetValueOrDefault", new Type[0]);
+            var hasValue = type.GetMethod("get_HasValue");
+            var a = il.DeclareLocal(type);
+            var b = il.DeclareLocal(type);
+
             il.Ldarg(0);
             il.Call(getMethod);
             il.Stloc(a);
@@ -125,6 +131,33 @@ namespace Emitted
             il.Call(getMethod);
             il.Stloc(b);
 
+            il.Ldloca(a);
+            il.Call(getValueOrDefault);
+            il.Ldloca(b);
+            il.Call(getValueOrDefault);
+            il.Bne_Un(returnFalse);
+
+            il.Ldloca(a);
+            il.Call(hasValue);
+            il.Ldloca(b);
+            il.Call(hasValue);
+            il.Bne_Un(returnFalse);
+        }
+
+        private static void EmitNullableEquals(GroboIL il, MethodInfo getMethod, GroboIL.Label returnFalse)
+        {
+            // a.Equals(b)
+            var type = getMethod.ReturnType;
+            var local = il.DeclareLocal(type);
+            il.Ldarg(0);
+            il.Call(getMethod);
+            il.Stloc(local);
+            il.Ldloca(local);
+            il.Ldarg(1);
+            il.Call(getMethod);
+            il.Box(type);
+            il.Call(ObjectEquals, type);
+            il.Brfalse(returnFalse);
         }
     }
 }

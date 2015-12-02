@@ -14,6 +14,11 @@
             return a.NullableInt32 == b.NullableInt32;
         }
 
+        public bool Equals_1_Single(Entity a, Entity b)
+        {
+            return a.NullableSingle.Equals(b.NullableSingle);
+        }
+
         public bool Equals_3(Entity a, Entity b)
         {
             var valueA = a.NullableInt32;

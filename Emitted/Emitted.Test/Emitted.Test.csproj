@@ -50,6 +50,20 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="Nullable\Boolean.cs" />
+    <Compile Include="Nullable\Byte.cs" />
+    <Compile Include="Nullable\Char.cs" />
+    <Compile Include="Nullable\Decimal.cs" />
+    <Compile Include="Nullable\Double.cs" />
+    <Compile Include="Nullable\Enum.cs" />
+    <Compile Include="Nullable\Int16.cs" />
+    <Compile Include="Nullable\Int32.cs" />
+    <Compile Include="Nullable\Int64.cs" />
+    <Compile Include="Nullable\SByte.cs" />
+    <Compile Include="Nullable\Single.cs" />
+    <Compile Include="Nullable\UInt16.cs" />
+    <Compile Include="Nullable\UInt32.cs" />
+    <Compile Include="Nullable\UInt64.cs" />
     <Compile Include="PrimitiveTypes\Enum.cs" />
     <Compile Include="PrimitiveTypes\Boolean.cs" />
     <Compile Include="PrimitiveTypes\Char.cs" />
